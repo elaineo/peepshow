@@ -1,5 +1,6 @@
 # peepshow
 
+### Video setup
 Get a camera running on raspberry pi:
 
 ```
@@ -13,4 +14,15 @@ Optional: Add `-vf` and `-hf` to flip the image vertically and horizontally.
 Turn captured images into a web stream:
 ```
 $ LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "input_file.so -f /tmp/stream -n pic.jpg" -o "output_http.so -w /usr/local/www"
+```
+
+### Create a tunnel from web to the live stream
+
+raspberry pi:
+```
+$ autossh -M 65500 -o "ExitOnForwardFailure yes" -o "ServerAliveInterval 60" -o "ServerAliveCountMax 3" -o "StrictHostKeyChecking=no" -R 10010:localhost:8080 root@45.76.1.186
+```
+web server:
+```
+$ ssh -p 10010 pi@localhost
 ```
