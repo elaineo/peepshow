@@ -1,4 +1,5 @@
 import logging, threading
+from datetime import datetime
 import sys
 sys.path.insert(0, 'googleapis')
 
@@ -41,13 +42,16 @@ class LndWrapper:
 
     def get_invoice(self, memo="Peepshow"):
         try:
+            expiry = { "creation_date": int(datetime.now().timestamp()),
+                        "expiry": self.DEFAULT_EXPIRY }
             request = ln.Invoice(
                 memo=memo,
                 value=self.DEFAULT_PRICE,
-                expiry=self.DEFAULT_EXPIRY
+                expiry=self.DEFAULT_EXPIRY,
+                creation_date=expiry["creation_date"]
             )
             response = self.stub.AddInvoice(request)
-            return MessageToJson(response)
+            return { **json.loads(MessageToJson(response)), **expiry}
         except grpc.RpcError as e:
            logging.error(e)
            return e.details()

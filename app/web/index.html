@@ -4,8 +4,8 @@
   </head>
   <body>
 	<canvas id="canvas" width="350" height="225"></canvas>
-	<button id="invoice">Go</button>
-	This invoice expires in 60 minutes. (add countdown timer)
+	<br><button id="invoice">Get Invoice</button>
+	<div id="timer"></div>
 	<div id="payreq"></div>
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -14,15 +14,31 @@
 	var c = document.getElementById("canvas");
 	var ctx = c.getContext("2d");
 
+	function startTimer(expiry) {
+		var timeLeft = expiry - Date.now() / 1000;
+	    setInterval(function () {
+	        hours = parseInt(timeLeft / 3600, 10)
+	        minutes = parseInt((timeLeft / 60) % 60, 10)
+	        seconds = parseInt(timeLeft % 60, 10);
+
+	        hours = hours < 10 ? "0" + hours : hours;
+	        minutes = minutes < 10 ? "0" + minutes : minutes;
+	        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+	        $("#timer").html("Expires: " + hours + ":" + minutes + ":" + seconds);
+
+	    }, 1000);
+	}
+
     $("#invoice").click(function(e) {
         e.preventDefault();
         $.ajax({
             type: "GET",
             url: '/invoice',
             dataType: "json",
-            success: function(res) {
-        	  var response = JSON.parse(res)
+            success: function(response) {
         	  console.log(response)
+        	  startTimer(response.expiry + response.creation_date)
 
               $("#payreq").text(response.payment_request);
               var lntb = "lightning:" + response.payment_request;
