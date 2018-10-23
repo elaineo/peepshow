@@ -15,9 +15,6 @@ class HTTPRequestHandler:
 		dummyHeaderfh = open('app/resources/dummy.header', 'r')
 		self.dummyHeader = dummyHeaderfh.read()
 
-		cssfh = open('app/web/style.css', 'r')
-		self.statusCSS = cssfh.read()
-
 		htmlfh = open('app/web/status.html', 'r')
 		self.statusHTML = htmlfh.read()
 
@@ -72,10 +69,6 @@ class HTTPRequestHandler:
 			if ("/status" in requestPath):
 				clientsock.sendall(b'HTTP/1.0 200 OK\r\nContentType: text/html\r\n\r\n')
 				clientsock.sendall(self.statusHTML.format(clientcount = self.broadcast.getClientCount(), bwin = float(self.status.bandwidthIn*8)/1000000, bwout = float(self.status.bandwidthOut*8)/1000000).encode("utf-8"))
-				clientsock.close()
-			elif ("/style.css" in requestPath):
-				clientsock.sendall(b'HTTP/1.0 200 OK\r\nContentType: text/html\r\n\r\n')
-				clientsock.sendall(self.statusCSS.encode("utf-8"))
 				clientsock.close()
 			elif ("/invoice" in requestPath):
 				clientsock.sendall(b'HTTP/1.0 200 OK\r\nContentType: application/json; charset=utf-8\r\n\r\n')
