@@ -112,6 +112,7 @@ class Broadcaster:
 
     def updateClients(self, inv):
         invoice = json.loads(inv)
+        logging.info(invoice)
         for client in self.clients:
             if client.r_hash == invoice["r_hash"]:
                 client.paid = invoice["settled"]
@@ -145,12 +146,13 @@ class Broadcaster:
             if (not client.connected):
                 clients.remove(client)
                 logging.info("Client left. Client count: {}".format(self.getClientCount()))
-            if (not client.paid):
-                logging.info("Client has not paid")
-            if client.paid and datetime.now() - client.timeConnected > timedelta(seconds=60):
-                # time's up! disconnect
-                client.kill = True
-            client.bufferStreamData(data)
+            if client.paid: 
+                if datetime.now() - client.timeConnected > timedelta(seconds=60):
+                    logging.info("time's up! disconnect")
+                    client.kill = True 
+                else:
+                    logging.info("Client paid")
+                    client.bufferStreamData(data)
 
     #
     # Broadcast data to all connected clients
@@ -159,7 +161,6 @@ class Broadcaster:
         self.lastFrameBuffer += data
         webSocketFrame, frame, bufferProcessedTo = self.extractFrames(self.lastFrameBuffer)
         if (webSocketFrame and frame):
-            logging.info(self.clients)
             #delete the frame now that it has been extracted, keep what remains in the buffer
             self.lastFrameBuffer = self.lastFrameBuffer[bufferProcessedTo:]
 
