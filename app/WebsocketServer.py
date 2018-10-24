@@ -8,6 +8,7 @@ import json
 from base64 import b64encode
 from hashlib import sha1
 from socketserver import ThreadingMixIn, TCPServer, StreamRequestHandler
+from urllib.parse import unquote
 
 
 
@@ -249,7 +250,7 @@ class WebSocketHandler(StreamRequestHandler):
             return
         r_hash = re.search('r_hash=(.+?) HTTP', message)
         if r_hash:
-            self.r_hash = r_hash.group(1)
+            self.r_hash = unquote(r_hash.group(1))
         else:
             print("Missing invoice r_hash")
             self.keep_alive = False
